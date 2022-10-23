@@ -1,0 +1,42 @@
+import threading
+import socket
+
+class Client:
+    def __init__(self, ip, corePort, edgePort):
+        self.mIP = ip
+        self.mCorePort = corePort
+        self.mEdgePort = edgePort
+
+        self.StartClient()
+
+    
+    def StartClient(self):
+        coreSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        coreSock.connect((self.mIP, self.mCorePort))
+
+        self.mEdgePort = int(coreSock.recv(1024))
+        coreSock.close()
+
+        print(self.mEdgePort)
+
+        edgeSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print(self.mIP, self.mEdgePort)
+        edgeSock.connect((self.mIP, self.mEdgePort))
+
+        sendThread = threading.Thread(target=self.SendEdge, args=(edgeSock, )).start()
+        receiveThread = threading.Thread(target=self.ReceiveEdge, args=(edgeSock, )).start()
+
+    
+    def SendEdge(self, socket):
+        while True:
+            socket.send(b'ping')
+    
+
+    def ReceiveEdge(self, socket):
+        while True:
+            request = socket.recv(1024)
+
+
+if __name__ == "__main__":
+    print("Client")
+    client = Client("127.0.0.1", 6678, 6680)
