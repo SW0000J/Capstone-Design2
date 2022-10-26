@@ -21,11 +21,11 @@ class Core:
     def StartCore(self):
         # Initialize edge's socket
         edgeSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        edgeSock.bind((self.mIP, self.mEdgePort))
+        edgeSock.bind((socket.gethostname(), self.mEdgePort))
         edgeSock.listen(5)
         # Initialize client's socket
         clientSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        clientSock.bind((self.mIP, self.mClientPort))
+        clientSock.bind((socket.gethostname(), self.mClientPort))
         clientSock.listen(5)
 
         edgeThread = threading.Thread(target=self.ConnectEdge, args=(edgeSock, )).start()
@@ -64,7 +64,7 @@ class Core:
 
 
     def MatchEdge(self, socket):
-        edgePort = self.BestResponseLoadBalancer()
+        edgePort = self.LeastConnectLoadBalancer()
 
         print(edgePort)
         socket.send(bytes(str(edgePort), 'utf8'))
@@ -85,14 +85,22 @@ class Core:
 
     
     def BestResponseLoadBalancer(self):
-        responseList = self.GetResponse()
+        responseList, clientCountList = self.GetResponse()
         print(responseList)
 
         return 6680+responseList.index(min(responseList))
 
     
+    def LeastConnectLoadBalancer(self):
+        responseList, clientCountList = self.GetResponse()
+        print(clientCountList)
+
+        return 6680+clientCountList.index(min(clientCountList))
+
+    
     def GetResponse(self):
         responseList = []
+        clientCountList = []
         edgeCount = 1
         for edgeSock, edgeAdd in self.mEdgeList:
             print(self.mEdgePort+edgeCount+200)
@@ -103,11 +111,12 @@ class Core:
 
             tmpSock.send(bytes("Core!", "utf8"))
             response = tmpSock.recv(1024)
+            clientCountList.append(int(response))
 
             responseList.append(time.time()-startTime)
             edgeCount += 1
 
-        return responseList
+        return responseList, clientCountList
 
 
 

@@ -1,5 +1,7 @@
 import threading
+import time
 import socket
+
 
 class Client:
     def __init__(self, ip, corePort, edgePort):
@@ -29,6 +31,7 @@ class Client:
     
     def SendEdge(self, socket):
         while True:
+            time.sleep(0.1)
             socket.send(b'ping')
     
 

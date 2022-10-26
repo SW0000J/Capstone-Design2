@@ -67,7 +67,7 @@ class Edge:
             
             response = tmpSock.recv(1024)
 
-            tmpSock.send(bytes("Core!", "utf8"))
+            tmpSock.send(bytes(str(self.mClientCount), "utf8"))
             print("Response:", address)
 
             #tmpSock.close()
