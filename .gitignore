@@ -33,3 +33,4 @@
 
 # Log Exception
 *.log
+__pycache__
