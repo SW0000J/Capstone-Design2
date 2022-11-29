@@ -3,9 +3,11 @@ import time
 import socket
 import random
 
+from logger import Logger
+
 
 class Core:
-    def __init__(self, ip, edgePort, clientPort):
+    def __init__(self, ip, edgePort=6679, clientPort=6678):
         self.mIP = ip
         self.mEdgePort = edgePort
         self.mClientPort = clientPort
@@ -14,6 +16,7 @@ class Core:
         self.mEdgeCount = 0
 
         self.rrIndex = 0
+        self.mLog = Logger("Server.log")
 
         self.StartCore()
 
@@ -21,11 +24,12 @@ class Core:
     def StartCore(self):
         # Initialize edge's socket
         edgeSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        edgeSock.bind((socket.gethostname(), self.mEdgePort))
+        edgeSock.bind((self.mIP, self.mEdgePort))
         edgeSock.listen(5)
+
         # Initialize client's socket
         clientSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        clientSock.bind((socket.gethostname(), self.mClientPort))
+        clientSock.bind((self.mIP, self.mClientPort))
         clientSock.listen(5)
 
         edgeThread = threading.Thread(target=self.ConnectEdge, args=(edgeSock, )).start()
@@ -37,6 +41,8 @@ class Core:
             sock, address = socket.accept()
             
             print(self.mEdgeCount)
+            self.mLog.PrintLog("***Edge Connection***")
+            self.mLog.PrintLog(f"Total Edge: {self.mEdgeCount+1}")
             self.mEdgeList.append((sock, address))
             self.mEdgeCount += 1
 
@@ -49,6 +55,8 @@ class Core:
     def SyncEdge(self, socket):
         while True:
             request = socket.recv(1024)
+            
+            self.mLog.PrintLog(request)
 
             for edgeSock, edgeAdd in self.mEdgeList:
                 if edgeSock != socket:
@@ -59,6 +67,7 @@ class Core:
         while True:
             sock, address = socket.accept()
             print("Client {}".format(address))
+            self.mLog.PrintLog("Client {}'s connection".format(address))
             
             matchEdgeHandler = threading.Thread(target=self.MatchEdge, args=(sock, )).start()
 
@@ -67,6 +76,7 @@ class Core:
         edgePort = self.LeastConnectLoadBalancer()
 
         print(edgePort)
+        self.mLog.PrintLog(f"Matching client to edge, {edgePort}")
         socket.send(bytes(str(edgePort), 'utf8'))
 
 
@@ -102,6 +112,8 @@ class Core:
         responseList = []
         clientCountList = []
         edgeCount = 1
+
+        self.mLog.PrintLog("***Check edge's response time***")
         for edgeSock, edgeAdd in self.mEdgeList:
             print(self.mEdgePort+edgeCount+200)
             tmpSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -113,8 +125,11 @@ class Core:
             response = tmpSock.recv(1024)
             clientCountList.append(int(response))
 
-            responseList.append(time.time()-startTime)
+            responseTime = time.time()-startTime
+            responseList.append(responseTime)
             edgeCount += 1
+
+            self.mLog.PrintLog("Edge {}'s response time".format(edgeSock))
 
         return responseList, clientCountList
 
@@ -122,4 +137,4 @@ class Core:
 
 if __name__ == "__main__":
     print("Core")
-    Core = Core("127.0.0.1", 6679, 6678)
+    Core = Core("127.0.0.1")

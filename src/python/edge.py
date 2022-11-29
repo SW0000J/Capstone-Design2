@@ -2,7 +2,7 @@ import threading
 import socket
 
 class Edge:
-    def __init__(self, ip, corePort, clientPort):
+    def __init__(self, ip, corePort=6679, clientPort=6680):
         self.mIP = ip
         self.mCorePort = corePort
         self.mClientPort = clientPort
@@ -75,4 +75,4 @@ class Edge:
 
 if __name__ == "__main__":
     print("Edge")
-    edge = Edge("127.0.0.1", 6679, 6680)
+    edge = Edge("127.0.0.1")

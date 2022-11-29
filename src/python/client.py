@@ -4,7 +4,7 @@ import socket
 
 
 class Client:
-    def __init__(self, ip, corePort, edgePort):
+    def __init__(self, ip, corePort=6678, edgePort=6680):
         self.mIP = ip
         self.mCorePort = corePort
         self.mEdgePort = edgePort
@@ -32,7 +32,9 @@ class Client:
     def SendEdge(self, socket):
         while True:
             time.sleep(0.1)
-            socket.send(b'ping')
+
+            msg = 'a'*1024
+            socket.send(bytes(msg, "utf8"))
     
 
     def ReceiveEdge(self, socket):
@@ -42,4 +44,4 @@ class Client:
 
 if __name__ == "__main__":
     print("Client")
-    client = Client("127.0.0.1", 6678, 6680)
+    client = Client("127.0.0.1")
