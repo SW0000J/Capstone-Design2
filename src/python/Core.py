@@ -3,7 +3,8 @@ import time
 import socket
 import random
 
-from logger import Logger
+from Logger import Logger
+from Packet import Packet
 
 
 class Core:
@@ -16,7 +17,7 @@ class Core:
         self.mEdgeCount = 0
 
         self.rrIndex = 0
-        self.mLog = Logger("Server.log")
+        self.mLog = Logger("CoreLog", "Server.log")
 
         self.StartCore()
 
@@ -55,12 +56,13 @@ class Core:
     def SyncEdge(self, socket):
         while True:
             request = socket.recv(1024)
+            request = Packet(request)
             
             self.mLog.PrintLog(request)
 
             for edgeSock, edgeAdd in self.mEdgeList:
                 if edgeSock != socket:
-                    edgeSock.send(request)
+                    edgeSock.send(request.GetData())
 
     
     def ConnectClient(self, socket):
@@ -121,7 +123,7 @@ class Core:
 
             startTime = time.time()
 
-            tmpSock.send(bytes("Core!", "utf8"))
+            tmpSock.send(bytes("test", "utf8"))
             response = tmpSock.recv(1024)
             clientCountList.append(int(response))
 

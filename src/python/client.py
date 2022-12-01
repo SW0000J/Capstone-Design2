@@ -2,6 +2,8 @@ import threading
 import time
 import socket
 
+from Packet import Packet
+
 
 class Client:
     def __init__(self, ip, corePort=6678, edgePort=6680):
@@ -33,8 +35,8 @@ class Client:
         while True:
             time.sleep(0.1)
 
-            msg = 'a'*1024
-            socket.send(bytes(msg, "utf8"))
+            msg = Packet()
+            socket.send(msg.GetData())
     
 
     def ReceiveEdge(self, socket):
@@ -45,3 +47,4 @@ class Client:
 if __name__ == "__main__":
     print("Client")
     client = Client("127.0.0.1")
+    
