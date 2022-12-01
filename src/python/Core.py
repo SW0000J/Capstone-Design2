@@ -132,6 +132,7 @@ class Core:
             edgeCount += 1
 
             self.mLog.PrintLog("Edge {}'s response time".format(edgeSock))
+            self.mLog.PrintLog(f"{response}")
 
         return responseList, clientCountList
 
