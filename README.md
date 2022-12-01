@@ -66,7 +66,9 @@ Local에서 Core와 Edge 서버를 동작할 때의 로그 결과.
 
 ![Load Balancing Result](./img/Loadbalancer%20Result.PNG)
 
-대규모 메타버스 사용자를 위한 분산 클라우드 최적의 알고리즘은 Least Connection 알고리즘인 최소 연결 알고리즘임.
+최소 연결 알고리즘의 응답시간이 가장 빠른 것으로 나타남. 이어서 라운드로빈, 최적 응답시간, 랜덤 알고리즘 순서로 응답시간이 빨랐음.
+
+따라서, 대규모 메타버스 사용자를 위한 분산 클라우드 최적의 알고리즘은 Least Connection 알고리즘인 최소 연결 알고리즘임.
 
 
 ## 요약
