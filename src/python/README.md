@@ -126,6 +126,8 @@ def ToClient(self, coreSocket):
 
 ## Client.py
 
+Client는 1초에 10번 Edge에 데이터를 전송하도록 함
+
 ```python
 def SendEdge(self, socket):
         while True:
